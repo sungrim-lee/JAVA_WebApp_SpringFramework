@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coderby.myapp.hr.dao.IMyListRepository">
+
+<select id="getAllMyList" resultType="com.coderby.myapp.hr.model.MyListVO">
+      SELECT L.MY_ID              AS myId,
+            L.DINING_ID           AS diningId,
+            L.DINING_NAME         AS diningName,
+            L.MY_OPINION          AS myOpinion,
+          	L.MY_GRADE            AS myGrade,
+           	L.MY_DATE             AS myDate,
+           	P.MY_PIC_NAME		  AS myPicName,
+           	P.MY_PIC_SIZE		  AS myPicSize,
+           	P.MY_PIC_CONTENT_TYPE AS myPicContentType,
+           	P.MY_PIC_DATA		  AS myPicData
+      FROM MY_LIST L  		
+      LEFT OUTER JOIN MY_PIC P
+      ON L.MY_ID = P.MY_ID
+      ORDER BY L.MY_ID DESC
+   </select>
+   
+   <select id="getMyListInfo" resultType="com.coderby.myapp.hr.model.MyListVO">
+       SELECT L.MY_ID 				AS myId,
+            L.DINING_ID        	    AS diningId,
+            L.DINING_NAME      	    AS diningName,
+            L.MY_OPINION       	    AS myOpinion,
+          	L.MY_GRADE         	    AS myGrade,
+           	L.MY_DATE             	AS myDate,
+           	P.MY_PIC_NAME			AS myPicName,
+           	P.MY_PIC_SIZE			AS myPicSize,
+           	P.MY_PIC_CONTENT_TYPE	AS myPicContentType,
+           	P.MY_PIC_DATA			AS myPicData
+      FROM MY_LIST L  		
+      LEFT OUTER JOIN MY_PIC P
+      ON L.MY_ID = P.MY_ID
+      WHERE L.MY_ID=#{myId}
+   </select>
+   
+   <insert id="insertMyList" parameterType="com.coderby.myapp.hr.model.MyListVO">
+   		INSERT INTO MY_LIST(
+   			MY_ID, DINING_ID, DINING_NAME,  MY_OPINION, MY_GRADE, MY_DATE)
+   		VALUES(
+   			#{myId}, #{diningId}, #{diningName}, #{myOpinion}, #{myGrade}, #{myDate} ) 			
+   </insert>
+   
+   <insert id="uploadFile" parameterType="com.coderby.myapp.hr.model.MyListVO">
+   		INSERT INTO MY_PIC(
+   			MY_ID, MY_PIC_NAME, MY_PIC_SIZE, MY_PIC_CONTENT_TYPE, MY_PIC_DATA)
+   		VALUES(
+   			#{myId}, #{myPicName}, #{myPicSize}, #{myPicContentType}, #{myPicData})
+   </insert>
+   
+   <select id="getFile"  resultType="com.coderby.myapp.hr.model.MyListVO">
+   		SELECT MY_ID             AS myId,
+            MY_PIC_NAME          AS myPicName,
+            MY_PIC_SIZE          AS myPicSize,
+            MY_PIC_CONTENT_TYPE  AS myPicContentType,
+            MY_PIC_DATA          AS myPicData
+      FROM MY_PIC
+      WHERE MY_ID=#{myId}
+   </select>
+   
+   <update id="updateMyList" parameterType="com.coderby.myapp.hr.model.MyListVO">
+		UPDATE MY_LIST
+		SET  MY_OPINION=#{myOpinion}, MY_GRADE=#{myGrade}, MY_DATE=#{myDate}
+		WHERE MY_ID=#{myId}
+	</update>
+	
+	 <update id="updateFile" parameterType="com.coderby.myapp.hr.model.MyListVO">
+   		UPDATE MY_PIC
+   		SET  MY_PIC_NAME=#{myPicName}, MY_PIC_SIZE=#{myPicSize}, 
+   		MY_PIC_CONTENT_TYPE=#{myPicContentType}, MY_PIC_DATA=#{myPicData} 
+   		WHERE MY_ID=#{myId}
+   </update>
+   
+	<delete id="deleteMyList" >
+		DELETE FROM MY_LIST
+		WHERE MY_ID=#{myid} AND DINING_NAME=#{diningname}
+	</delete>
+	
+	<delete  id="deleteFile" >
+   		DELETE FROM MY_PIC
+		WHERE MY_ID=#{myid}
+   </delete >
+   
+   <select id="getAllDiningId" resultType="hashmap">
+   		SELECT
+   			DINING_ID		AS	 diningId,
+   			DINING_NAME		AS	 diningName
+   		FROM DINING
+   </select>
+   
+   <select id="getMaxMyId" resultType="int">
+   		SELECT NVL(MAX(MY_ID),0)  FROM MY_LIST
+   </select>
+</mapper>

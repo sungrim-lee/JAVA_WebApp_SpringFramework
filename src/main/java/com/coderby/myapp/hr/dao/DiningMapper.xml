@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.coderby.myapp.hr.dao.IDiningRepository">
+
+   <resultMap id="diningMap" type="com.coderby.myapp.hr.model.DiningVO">
+      <result property="diningId" column="dining_id"/>
+      <result property="diningName" column="dining_name"/>
+      <result property="diningUrl" column="dining_url"/>
+      <result property="keyword" column="keyword"/>
+      <result property="grade" column="grade"/>
+      <result property="hashtag" column="hashtag"/>
+      <result property="locationDetail" column="location_detail"/>
+      <result property="locationSimple" column="location_simple"/>
+      <result property="phoneNumber" column="phone_number"/>
+      <result property="picture" column="picture"/>
+      <result property="wordcloud" column="wordcloud"/>
+   </resultMap>
+<!-- 가게이름으로 조회, 키워드로 조회, 해시태그로 조회, 지역별 조회[구이름, 입력지역이름] order by grade-->
+   <select id="selectByDiningName" parameterType="com.coderby.myapp.hr.model.DiningVO" resultMap="diningMap">
+      
+      select * from dining 
+      where
+      <if test="diningName != null">
+         dining_name like '%'||#{diningName}||'%'
+      </if>
+      <if test="keyword != null">
+         and keyword like '%'||#{keyword}||'%'
+      </if>
+      <if test="hashtag != null">
+         and hashtag like '%'||#{hashtag}||'%'
+      </if>
+      <if test="location != null">
+         and location_detail like '%'||#{location}||'%'
+      </if>
+      order by grade desc
+   </select>
+   
+   <select id="selectCount" parameterType="String" resultType="int">
+      
+      select count(*) from dining 
+      where
+      <if test="diningName != null">
+         dining_name like '%'||#{diningName}||'%'
+      </if>
+      <if test="keyword != null">
+         and keyword like '%'||#{keyword}||'%'
+      </if>
+      <if test="hashtag != null">
+         and hashtag like '%'||#{hashtag}||'%'
+      </if>
+      <if test="location != null">
+         and location_detail like '%'||#{location}||'%'
+      </if>
+      order by grade desc
+   </select>
+   
+   <select id="selectPage" parameterType="String" resultType="com.coderby.myapp.hr.model.DiningVO">
+      select    dining_id       as diningId,
+            dining_name      as diningName,
+            dining_url      as diningUrl,
+            keyword         as keyword,
+            grade         as grade,
+            hashtag         as hashtag,
+            location_detail   as locationDetail,
+            location_simple   as locationSimple,
+            phone_number   as phoneNumber,
+            picture         as picture,
+            wordcloud       as wordcloud
+         from 
+         (select rownum as rnum,
+         dining_id,
+         dining_name,
+         dining_url,
+         keyword,
+         grade,
+         hashtag,
+         location_detail,
+         location_simple,
+         phone_number,
+         picture,
+         wordcloud 
+         from 
+      (select * from dining 
+          where
+      <if test="diningName != null">
+         dining_name like '%'||#{diningName}||'%'
+      </if>
+      <if test="keyword != null">
+         and keyword like '%'||#{keyword}||'%'
+      </if>
+      <if test="hashtag != null">
+         and hashtag like '%'||#{hashtag}||'%'
+      </if>
+      <if test="location != null">
+         and location_detail like '%'||#{location}||'%'
+      </if>
+      order by grade desc))
+      where rnum between 10*#{pagecount}+1 and 10*#{pagecount}+10
+   </select>
+    
+   
+   <!-- 
+   <select id="selectByDiningName" parameterType="String" resultMap="diningMap">
+      select * from dining 
+      <if test="diningName != null">
+         where dining_name like '%'||#{diningName}||'%'  
+      </if>
+      order by grade desc
+   </select>
+    -->
+   <select id="selectByDiningId" parameterType="int" resultType="com.coderby.myapp.hr.model.DiningVO">
+      select    dining_id    as diningId,
+            dining_name   as diningName,
+            dining_url    as diningUrl,
+            keyword      as keyword,
+            grade      as grade,
+            hashtag      as hashtag,
+            location_detail   as locationDetail,
+            location_simple   as locationSimple,
+            phone_number   as phoneNumber,
+            picture         as picture,
+            wordcloud      as wordcloud 
+      from dining    
+      where dining_id=#{diningId}
+      order by grade desc
+   </select>
+
+   <select id="selectByKeyword" parameterType="string" resultMap="diningMap">
+      select * from dining 
+      <if test="keyword != null">
+         where keyword like '%#{keyword}%'
+      </if>
+      order by grade desc
+   </select>
+   
+   <select id="selectByHashtag" parameterType="string" resultMap="diningMap">
+      select * from dining
+      <if test="hashtag != null">
+         where hashtag like '%#{hashtag}%'
+      </if>
+      order by grade desc
+   </select>
+   
+   <select id="selectByLocation" parameterType="string" resultMap="diningMap">
+      select * from dining
+      <if test="location != null">
+         where location_detail like '%#{location}%'
+      </if>
+      order by grade desc
+   </select>
+   
+</mapper>
